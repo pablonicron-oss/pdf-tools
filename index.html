@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PDF Tools</title>
+  <title>Unir PDF</title>
 </head>
 <body style="font-family: Arial; text-align: center; padding: 50px;">
+
   <h1>Unir PDF</h1>
 
   <input type="file" multiple id="files"><br><br>
@@ -13,9 +14,49 @@
   <p id="status"></p>
 
   <script>
-    function merge() {
-      document.getElementById("status").innerText = "Todavía no funciona 😏";
+    async function merge() {
+      const files = document.getElementById("files").files;
+      const status = document.getElementById("status");
+
+      if (files.length < 2) {
+        status.innerText = "Seleccioná al menos 2 PDFs";
+        return;
+      }
+
+      status.innerText = "Procesando...";
+
+      const formData = new FormData();
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+
+      try {
+        const response = await fetch("/api/merge", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al procesar");
+        }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "merged.pdf";
+        a.click();
+
+        status.innerText = "Listo 🚀";
+
+      } catch (error) {
+        status.innerText = "Error 😢";
+        console.error(error);
+      }
     }
   </script>
+
 </body>
 </html>
