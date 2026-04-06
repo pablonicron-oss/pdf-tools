@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   try {
-    const files = req.body;
+const formData = await req.formData();
+const files = formData.getAll("files");
 
     const publicKey = process.env.ILOVEPDF_PUBLIC_KEY;
     const secretKey = process.env.ILOVEPDF_SECRET_KEY;
